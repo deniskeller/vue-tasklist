@@ -8,20 +8,21 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    taskList: []
+    todos: [],
   },
   getters: {
 
   },
   mutations: {
-    
+
   },
   actions: {
 
-    addTask(ctx, title) {
+
+    addTask(ctx, text) {
       const date = new Date();
       const task = {
-        title,
+        text,
         done: false,
         date
       }
@@ -42,6 +43,17 @@ export default new Vuex.Store({
           console.error("Error removing document: ", error);
         });
     },
+
+    doneTask(ctx, task) {
+      db.collection("taskList")
+        .doc(task.id)
+        .update({
+          done: !task.done
+        }).then(function () {
+          ctx.commit('doneTask', task.done)
+          this.task.done = !this.task.done;
+        })
+    }
 
   },
   modules: {}

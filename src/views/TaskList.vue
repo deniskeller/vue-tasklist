@@ -8,11 +8,10 @@
     </div>
 
     <div class="task-form">
-      <div v-if="errors !== ''" id="errors">{{ errors }}</div>
-      <div class="task-form__text-overflow">
+      <div class="task-form__text-overflow" :class="{'error': error}">
         <textarea
-          v-model.trim="title"
-          @keyup.enter="addTask(title, done)"
+          v-model.trim="text"
+          @keyup.enter="addTask"
           type="text"
           placeholder="Enter a title for this card..."
           class="task-form__text"
@@ -36,7 +35,7 @@
       <TaskItem
         v-for="(task, index) in tasks"
         :key="task.key"
-        :title="task.title"
+        :text="task.text"
         :index="index"
         :task="task"
       />
@@ -70,10 +69,10 @@ export default {
   data() {
     return {
       tasks: [],
-      title: "",
+      text: "",
       done: false,
       date: "",
-      errors: ""
+      error: false
     };
   },
   firestore() {
@@ -83,25 +82,33 @@ export default {
   },
   methods: {
     addTask() {
-      if (this.title !== "") {
-        this.$store.dispatch("addTask", this.title);
-        this.title = "";
+      if (this.text !== "") {
+        this.$store.dispatch("addTask", this.text);
+        this.text = "";
       } else {
-        this.errors = true;
+        this.error = true;
       }
     },
 
     clearTitle() {
-      this.title = "";
+      this.text = "";
     }
   },
   mounted() {
     // console.log(db);
+  },
+  watch: {
+    text() {
+      if (this.text !== "") {
+        this.error = true;
+      }
+      this.error = false;
+    }
   }
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .task-content {
   max-width: 500px;
   width: 100%;
@@ -327,5 +334,8 @@ export default {
       margin-right: 5px;
     }
   }
+}
+.error {
+  border: 1px solid red;
 }
 </style>

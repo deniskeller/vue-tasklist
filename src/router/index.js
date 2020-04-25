@@ -10,12 +10,9 @@ const routes = [{
     component: TaskList
   },
   {
-    path: '/TaskEdit',
+    path: '/TaskEdit/:id',
     name: 'TaskEdit',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import( /* webpackChunkName: "about" */ '../views/TaskEdit.vue')
+    component: () => import('../views/TaskEdit.vue')
   }
 ]
 

@@ -1,8 +1,8 @@
 <template>
-  <div class="task-list__item">
-    <span>{{ num }}) {{ newTitle }}</span>
+  <div class="task-list__item" :class="{'active': is_active}">
+    <span :class="{'task-list__item--done': done}">{{ num }}) {{ newTitle }}</span>
 
-    <div class="task-list__item__edit" @click="showMenu">
+    <div class="task-list__item__edit" @click="showMenu()">
       <svg
         class="edit"
         xmlns="http://www.w3.org/2000/svg"
@@ -17,16 +17,16 @@
       </svg>
     </div>
 
-    <div class="task-list__item__menu" v-show="visible">
-      <div class="task-list__item__menu-item" @click="doTodo(task)">Выполнено</div>
-      <div class="task-list__item__menu-item">Редактировать</div>
+    <div class="task-list__item__menu" id="menu" v-if="visible">
+      <div class="task-list__item__menu-item" @click="doneTask(task)">{{ doneText }}</div>
+      <router-link :to="'/task/' + task.key" class="task-list__item__menu-item">Редактировать</router-link>
       <div class="task-list__item__menu-item" @click="deleteTask(task.id)">Удалить</div>
     </div>
   </div>
 </template>
 
 <script>
-import { db } from "../main";
+// import { db } from "../main";
 export default {
   props: {
     task: {
@@ -43,18 +43,30 @@ export default {
       visible: false
     };
   },
+
   methods: {
     showMenu() {
       this.visible = !this.visible;
+      document.addEventListener("click", this.close);
     },
+    close(e) {
+      if (!this.$el.contains(e.target)) {
+        this.visible = false;
+        document.removeEventListener("click", this.close);
+        console.log("kek");
+      }
+      console.log("lol");
+    },
+
     deleteTask(id) {
       this.$store.dispatch("deleteTask", id);
       this.visible = false;
     },
-    doTodo(task) {
-      db.collection("taskList")
-        .doc(task.id)
-        .update({ done: !task.done });
+    doneTask(task) {
+      this.$store.dispatch("doneTask", task);
+      this.task.done = !this.task.done;
+
+      this.visible = false;
     }
   },
   computed: {
@@ -63,17 +75,33 @@ export default {
       return num;
     },
     newTitle() {
-      let newTitle = this.task.title;
-      if (this.task.title.length > 30) {
-        return (newTitle = this.task.title.slice(0, 30) + "...");
+      let newTitle = this.task.text;
+      if (this.task.text.length > 30) {
+        return (newTitle = this.task.text.slice(0, 30) + "...");
       }
       return newTitle;
+    },
+    done() {
+      let done = this.task.done;
+      return done;
+    },
+    doneText() {
+      if (this.done) {
+        return "Не выполнено";
+      }
+      return "Выполнено";
+    },
+    is_active() {
+      if (this.visible) {
+        return true;
+      }
+      return false;
     }
-  }
+  },
+  watch: {}
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .task-list__item {
   background-color: #fff;
@@ -113,7 +141,7 @@ export default {
     left: 110%;
     position: absolute;
     top: 0;
-    width: 240px;
+    width: auto;
     z-index: 0;
     transform: translateX(-20px);
     transition: opacity 85ms ease-in, transform 85ms ease-in;
@@ -123,6 +151,7 @@ export default {
       clear: both;
       color: #e6e6e6;
       display: block;
+      width: auto;
       float: left;
       margin-bottom: 4px;
       padding: 6px 12px 6px 8px;
@@ -136,5 +165,17 @@ export default {
       }
     }
   }
+}
+.active {
+  background-color: rgba(176, 203, 247, 0.2) !important;
+  .task-list__item__edit {
+    display: block;
+    svg {
+      fill: #000;
+    }
+  }
+}
+.task-list__item--done {
+  text-decoration: line-through;
 }
 </style>
