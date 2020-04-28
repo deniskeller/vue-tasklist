@@ -1,19 +1,26 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import TaskList from '../views/TaskList.vue'
+import TaskEdit from '../views/TaskEdit.vue'
 
 Vue.use(VueRouter)
 
 const routes = [{
     path: '/',
+    name: 'main',
+    redirect: '/page/1'
+  },
+  {
+    path: '/page/:pageNumber',
     name: 'TaskList',
     component: TaskList
   },
   {
-    path: '/TaskEdit/:id',
+    path: '/edit/:key',
     name: 'TaskEdit',
-    component: () => import('../views/TaskEdit.vue')
-  }
+    component: TaskEdit
+  },
+
 ]
 
 const router = new VueRouter({

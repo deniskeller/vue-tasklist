@@ -2,7 +2,7 @@
   <div class="todo-page">
     <h2 class="todo-title">{{ newTodoTitle }}</h2>
     <div v-show="errorMessage" class="error-message">Поле не может быть пустым</div>
-    <textarea v-model="newTodoTitle" class="task_input" rows="5" placeholder="Введите задачу"></textarea>
+    <textarea v-model.trim="newTodoTitle" class="task_input" rows="5" placeholder="Введите задачу"></textarea>
     <div class="buttons">
       <button @click="editTodo" class="button" :disabled="false">Изменить</button>
       <router-link to="/" class="button">Назад</router-link>
@@ -21,15 +21,15 @@ export default {
     };
   },
   computed: {
-    todo() {
+    task() {
       return this.$store.getters.editedTodo(this.todoId);
     }
   },
   methods: {
     editTodo() {
-      if (this.newTodoTitle.trim()) {
-        this.todo.title = this.newTodoTitle.trim();
-        this.$store.dispatch("editTodo", this.todo);
+      if (this.newTodoTitle) {
+        this.task.text = this.newTodoTitle;
+        this.$store.dispatch("editTodo", this.task);
         this.$router.go(-1);
       } else {
         this.errorMessage = true;
@@ -37,11 +37,11 @@ export default {
     }
   },
   mounted() {
-    this.newTodoTitle = this.todo.title;
+    this.newTodoTitle = this.task.text;
   },
   watch: {
-    todo() {
-      this.newTodoTitle = this.todo.title;
+    task() {
+      this.newTodoTitle = this.task.text;
     }
   }
 };

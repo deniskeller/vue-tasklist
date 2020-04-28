@@ -19,7 +19,7 @@
 
     <div class="task-list__item__menu" id="menu" v-if="visible">
       <div class="task-list__item__menu-item" @click="doneTask(task)">{{ doneText }}</div>
-      <router-link :to="'/task/' + task.key" class="task-list__item__menu-item">Редактировать</router-link>
+      <div class="task-list__item__menu-item" @click="editTask(task)">Редактировать</div>
       <div class="task-list__item__menu-item" @click="deleteTask(task.id)">Удалить</div>
     </div>
   </div>
@@ -53,9 +53,7 @@ export default {
       if (!this.$el.contains(e.target)) {
         this.visible = false;
         document.removeEventListener("click", this.close);
-        console.log("kek");
       }
-      console.log("lol");
     },
 
     deleteTask(id) {
@@ -65,13 +63,15 @@ export default {
     doneTask(task) {
       this.$store.dispatch("doneTask", task);
       this.task.done = !this.task.done;
-
-      this.visible = false;
+      // this.visible = false;
+    },
+    editTask(task) {
+      this.$router.push({ name: "TaskEdit", params: { key: task.key, task } });
     }
   },
   computed: {
     num() {
-      let num = this.index + 1;
+      let num = this.task.key;
       return num;
     },
     newTitle() {

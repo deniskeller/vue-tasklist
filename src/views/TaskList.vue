@@ -22,7 +22,7 @@
         <div class="task-form__delete" @click="clearTitle">
           <span></span>
         </div>
-        <div class="task-form__options">
+        <div class="task-form__options" @click="sortTask">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path d="M9 3L5 6.99h3V14h2V6.99h3L9 3zm7 14.01V10h-2v7.01h-3L15 21l4-3.99h-3z" />
             <path d="M0 0h24v24H0z" fill="none" />
@@ -43,48 +43,81 @@
 
     <div class="task-empty" v-else>У вас пока нет задач</div>
 
-    <div class="task-control" v-if="tasks.length > 1">
-      <button class="task-control__prev-btn task-control--btn">
+    <div class="task-control" v-if="tasks.length > 10">
+      <router-link
+        :class="{'disable': prevDisable}"
+        :to="'/page/' + (pageNumber-1)"
+        class="task-control__prev-btn task-control--btn"
+      >
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
           <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
           <path d="M0 0h24v24H0z" fill="none" />
         </svg>
-      </button>
-      <button class="task-control__next-btn task-control--btn">
+      </router-link>
+      <router-link
+        :class="{'disable': nextDisable}"
+        :to="'/page/'+ (pageNumber+1)"
+        class="task-control__next-btn task-control--btn"
+      >
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
           <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
           <path d="M0 0h24v24H0z" fill="none" />
         </svg>
-      </button>
+      </router-link>
     </div>
   </div>
 </template>
 
 <script>
-import { db } from "../main";
+// import { db } from "../main";
 
 import TaskItem from "../components/TaskItem";
 export default {
   components: { TaskItem },
   data() {
     return {
-      tasks: [],
+      // tasks: [],
       text: "",
       done: false,
       date: "",
       error: false
     };
   },
-  firestore() {
-    return {
-      tasks: db.collection("taskList").orderBy("date")
-    };
+  // firestore() {
+  //   return {
+  //     tasks: db.collection("taskList").orderBy("date")
+  //   };
+  // },
+  computed: {
+    tasks() {
+      const pageNumber = +this.$route.params.pageNumber;
+      const tasks = this.$store.getters.tasks(pageNumber - 1);
+      return tasks;
+    },
+    pageNumber() {
+      const page = +this.$route.params.pageNumber;
+      return page;
+    },
+    prevDisable() {
+      if (this.pageNumber <= 1) {
+        return true;
+      }
+      return false;
+    },
+    nextDisable() {
+      let taskLength = this.$store.state.tasks.length;
+      if (taskLength <= this.pageNumber * 10) {
+        return true;
+      }
+      return false;
+    }
   },
   methods: {
     addTask() {
       if (this.text !== "") {
         this.$store.dispatch("addTask", this.text);
         this.text = "";
+        if (this.page !== 1) this.$router.push("/page/1");
       } else {
         this.error = true;
       }
@@ -92,10 +125,19 @@ export default {
 
     clearTitle() {
       this.text = "";
+    },
+    sortTask() {
+      this.$store.dispatch("sortTask");
     }
   },
   mounted() {
-    // console.log(db);
+    let pageNumber = +this.$route.params.pageNumber;
+    if (this.tasks.length > 0) {
+      this.loading = false;
+    }
+    if (pageNumber < 0) {
+      this.$router.push("/page/1");
+    }
   },
   watch: {
     text() {
@@ -103,6 +145,20 @@ export default {
         this.error = true;
       }
       this.error = false;
+    },
+    tasks() {
+      let pageNumber = +this.$route.params.pageNumber;
+      let arrLength = Math.ceil(this.$store.state.tasks.length / 10);
+
+      if (this.tasks.length > 0) {
+        this.loading = false;
+        this.emptyTodos = false;
+      } else if (this.tasks.length === 0 && pageNumber !== 1) {
+        this.$router.push("/page/" + arrLength);
+      } else if (this.tasks.length === 0) {
+        this.loading = false;
+        this.emptyTodos = true;
+      }
     }
   }
 };
@@ -337,5 +393,8 @@ export default {
 }
 .error {
   border: 1px solid red;
+}
+.disable {
+  pointer-events: none;
 }
 </style>

@@ -11,10 +11,22 @@ export default {
       // tasks: []
     };
   },
-  firestore() {
-    return {
-      tasks: db.collection("taskList").orderBy("date")
-    };
+  // firestore() {
+  //   return {
+  //     tasks: db.collection("taskList").orderBy("date")
+  //   };
+  // },
+  created() {
+    db.collection("taskList")
+      .orderBy("date")
+      .get()
+      .then(querySnapshot => {
+        const tasks = querySnapshot.docs.map(doc => {
+          return { ...doc.data(), id: doc.id };
+        });
+        this.$store.dispatch("getTasks", tasks);
+      });
+    // console.log(this.$store.state.tasks);
   }
 };
 </script>
