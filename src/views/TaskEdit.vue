@@ -1,11 +1,16 @@
 <template>
-  <div class="todo-page">
-    <h2 class="todo-title">{{ newTodoTitle }}</h2>
-    <div v-show="errorMessage" class="error-message">Поле не может быть пустым</div>
-    <textarea v-model.trim="newTodoTitle" class="task_input" rows="5" placeholder="Введите задачу"></textarea>
-    <div class="buttons">
-      <button @click="editTodo" class="button" :disabled="false">Изменить</button>
-      <router-link to="/" class="button">Назад</router-link>
+  <div class="task-edit">
+    <div class="task-edit__text-overflow" :class="{'error': errorMessage}">
+      <textarea
+        v-model.trim="newTodoTitle"
+        class="task-edit__text"
+        placeholder="Enter a title for this card..."
+      ></textarea>
+    </div>
+
+    <div class="task-edit__buttons">
+      <button @click="editTodo" class="btn-save">Save</button>
+      <router-link to="/" class="btn-back">Back</router-link>
     </div>
   </div>
 </template>
@@ -47,53 +52,75 @@ export default {
 };
 </script>
 
-<style scoped>
-.todo-page {
-  display: flex;
-  flex-direction: column;
-  align-items: start;
-}
-
-.todo-title {
-  color: #35495e;
-}
-
-.buttons {
+<style lang="scss" scoped>
+.task-edit {
+  max-width: 500px;
   width: 100%;
-}
-
-.task_input {
-  margin: 25px 0 15px;
-  padding: 10px;
-  width: 100%;
+  margin: 0 auto;
+  background: #ebecf0;
   border-radius: 5px;
-  resize: none;
-  box-sizing: border-box;
-  border: 3px solid #41b883;
-  font-size: 20px;
-  color: #35495e;
-}
-
-.task_input::placeholder {
-  font-size: 20px;
-}
-
-.task_input:focus {
-  outline: none;
-}
-
-.button:disabled:hover {
-  background-color: #ccc;
-  box-shadow: none;
-  color: #fff;
-}
-
-.error-message {
-  width: 100%;
-  box-sizing: border-box;
-  border-radius: 5px;
-  background-color: #eb6059;
-  color: #fff;
-  padding: 10px;
+  margin-top: 50px;
+  padding: 30px 13px 10px;
+  &__text-overflow {
+    overflow: hidden;
+    padding: 6px 8px 2px;
+    position: relative;
+    z-index: 10;
+    background: #fff;
+    margin-bottom: 15px;
+    border-radius: 5px;
+  }
+  &__text {
+    display: block;
+    font-size: 16px;
+    line-height: 20px;
+    color: #172b4d;
+    background: #fff;
+    width: 100%;
+    height: auto;
+    max-height: 162px;
+    min-height: 70px;
+    overflow-y: auto;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    overflow: hidden;
+    overflow-wrap: break-word;
+    resize: none;
+  }
+  &__text::placeholder {
+    font-size: 16px;
+  }
+  .error {
+    border: 1px solid red;
+  }
+  &__buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .btn-save {
+      background-color: #5aac44;
+      box-shadow: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      display: inline-block;
+      font-weight: 600;
+      line-height: 20px;
+      margin-right: 15px;
+      padding: 12px 15px;
+      text-align: center;
+      border-radius: 3px;
+      &:hover {
+        background-color: #61bd4f;
+      }
+    }
+    .btn-back {
+      font-size: 20px;
+      line-height: 24px;
+      font-weight: 600;
+      padding-left: 10px;
+    }
+  }
 }
 </style>
