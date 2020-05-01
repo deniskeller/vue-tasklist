@@ -31,6 +31,8 @@
       </div>
     </div>
 
+    <Loader v-if="loading" />
+
     <div class="task-list" v-if="tasks.length">
       <TaskItem
         v-for="(task, index) in tasks"
@@ -43,7 +45,7 @@
 
     <div class="task-empty" v-else>У вас пока нет задач</div>
 
-    <div class="task-control" v-if="tasks.length > 10">
+    <div class="task-control" v-if="showPagination">
       <router-link
         :class="{'disable': prevDisable}"
         :to="'/page/' + (pageNumber-1)"
@@ -72,15 +74,15 @@
 // import { db } from "../main";
 
 import TaskItem from "../components/TaskItem";
+import Loader from "../components/Loader";
 export default {
-  components: { TaskItem },
+  components: { TaskItem, Loader },
   data() {
     return {
-      // tasks: [],
       text: "",
-      done: false,
       date: "",
-      error: false
+      error: false,
+      loading: true
     };
   },
   // firestore() {
@@ -97,6 +99,13 @@ export default {
     pageNumber() {
       const page = +this.$route.params.pageNumber;
       return page;
+    },
+    showPagination() {
+      let taskLength = this.$store.state.tasks.length;
+      if (taskLength > 10) {
+        return true;
+      }
+      return false;
     },
     prevDisable() {
       if (this.pageNumber <= 1) {
@@ -127,7 +136,7 @@ export default {
       this.text = "";
     },
     sortTask() {
-      this.$store.dispatch("sortTask");
+      this.$store.state.tasks.reverse();
     }
   },
   mounted() {
@@ -152,12 +161,10 @@ export default {
 
       if (this.tasks.length > 0) {
         this.loading = false;
-        this.emptyTodos = false;
       } else if (this.tasks.length === 0 && pageNumber !== 1) {
         this.$router.push("/page/" + arrLength);
       } else if (this.tasks.length === 0) {
         this.loading = false;
-        this.emptyTodos = true;
       }
     }
   }
@@ -306,70 +313,7 @@ export default {
       }
     }
   }
-  .task-list {
-    &__item {
-      background-color: #fff;
-      border-radius: 3px;
-      box-shadow: 0 1px 0 rgba(9, 30, 66, 0.25);
-      display: flex;
-      align-items: center;
-      margin-bottom: 8px;
-      width: 100%;
-      min-height: 50px;
-      padding: 3px 45px 3px 15px;
-      position: relative;
-      text-decoration: none;
-      z-index: 0;
-      &:hover {
-        background-color: rgba(176, 203, 247, 0.2);
-        .task-list__item__edit {
-          display: block;
-          svg:hover {
-            fill: #000;
-          }
-        }
-      }
-      &__edit {
-        display: none;
-        position: absolute;
-        right: 15px;
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-        svg {
-          fill: #ccc;
-        }
-      }
 
-      &__menu {
-        left: 110%;
-        position: absolute;
-        top: 0;
-        width: 240px;
-        z-index: 0;
-        transform: translateX(-20px);
-        transition: opacity 85ms ease-in, transform 85ms ease-in;
-        &-item {
-          background: rgba(0, 0, 0, 0.6);
-          border-radius: 3px;
-          clear: both;
-          color: #e6e6e6;
-          display: block;
-          float: left;
-          margin-bottom: 4px;
-          padding: 6px 12px 6px 8px;
-          text-decoration: none;
-          transition: transform 85ms ease-in;
-          &:hover {
-            background: rgba(0, 0, 0, 0.8);
-            color: #fff;
-            transform: translateX(5px);
-            cursor: pointer;
-          }
-        }
-      }
-    }
-  }
   .task-empty {
     text-align: center;
   }

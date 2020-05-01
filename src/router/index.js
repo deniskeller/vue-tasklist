@@ -1,7 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import TaskList from '../views/TaskList.vue'
-import TaskEdit from '../views/TaskEdit.vue'
 
 Vue.use(VueRouter)
 
@@ -13,12 +11,12 @@ const routes = [{
   {
     path: '/page/:pageNumber',
     name: 'TaskList',
-    component: TaskList
+    component: () => import('../views/TaskList.vue')
   },
   {
     path: '/edit/:key',
     name: 'TaskEdit',
-    component: TaskEdit
+    component: () => import('../views/TaskEdit.vue')
   },
 
 ]

@@ -1,16 +1,16 @@
 <template>
   <div class="task-edit">
-    <div class="task-edit__text-overflow" :class="{'error': errorMessage}">
+    <div class="task-edit__text-overflow" :class="{'error': error}">
       <textarea
-        v-model.trim="newTodoTitle"
+        v-model.trim="newText"
         class="task-edit__text"
         placeholder="Enter a title for this card..."
       ></textarea>
     </div>
 
     <div class="task-edit__buttons">
-      <button @click="editTodo" class="btn-save">Save</button>
-      <router-link to="/" class="btn-back">Back</router-link>
+      <button @click="editTask" class="btn-save">Save</button>
+      <div @click="goBack" class="btn-back">Back</div>
     </div>
   </div>
 </template>
@@ -19,34 +19,37 @@
 export default {
   data() {
     return {
-      todoId: this.$route.params.key,
-      errorMessage: false,
-      buttonDisabled: false,
-      newTodoTitle: ""
+      taskId: this.$route.params.key,
+      error: false,
+      newText: ""
     };
   },
   computed: {
     task() {
-      return this.$store.getters.editedTodo(this.todoId);
+      return this.$store.getters.editedTask(this.taskId);
     }
   },
   methods: {
-    editTodo() {
-      if (this.newTodoTitle) {
-        this.task.text = this.newTodoTitle;
-        this.$store.dispatch("editTodo", this.task);
+    editTask() {
+      if (this.newText) {
+        this.task.text = this.newText;
+        this.$store.dispatch("editTask", this.task);
         this.$router.go(-1);
       } else {
-        this.errorMessage = true;
+        this.error = true;
       }
+    },
+    goBack() {
+      this.$router.go(-1);
     }
   },
   mounted() {
-    this.newTodoTitle = this.task.text;
+    this.newText = this.task.text;
+    console.log(this.task);
   },
   watch: {
     task() {
-      this.newTodoTitle = this.task.text;
+      this.newText = this.task.text;
     }
   }
 };
@@ -120,6 +123,7 @@ export default {
       line-height: 24px;
       font-weight: 600;
       padding-left: 10px;
+      cursor: pointer;
     }
   }
 }

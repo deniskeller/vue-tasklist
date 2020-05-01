@@ -67,6 +67,7 @@ export default {
     },
     editTask(task) {
       this.$router.push({ name: "TaskEdit", params: { key: task.key, task } });
+      // this.$store.commit("editTask", this.task.id);
     }
   },
   computed: {
@@ -115,7 +116,6 @@ export default {
   padding: 3px 45px 3px 15px;
   position: relative;
   text-decoration: none;
-  z-index: 0;
   &:hover {
     background-color: rgba(176, 203, 247, 0.2);
     .task-list__item__edit {
@@ -138,11 +138,11 @@ export default {
   }
 
   &__menu {
-    left: 110%;
+    right: -20px;
     position: absolute;
-    top: 0;
+    top: 55px;
     width: auto;
-    z-index: 0;
+    z-index: 1000;
     transform: translateX(-20px);
     transition: opacity 85ms ease-in, transform 85ms ease-in;
     &-item {
@@ -152,7 +152,7 @@ export default {
       color: #e6e6e6;
       display: block;
       width: auto;
-      float: left;
+      float: right;
       margin-bottom: 4px;
       padding: 6px 12px 6px 8px;
       text-decoration: none;
