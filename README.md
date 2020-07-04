@@ -1,24 +1,9 @@
-# workspace
+# Vue todo app
 
-## Project setup
-```
-npm install
-```
+#### demo
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+https://vue-tasklist.deniskeller.now.sh/page/1
 
-### Compiles and minifies for production
-```
-npm run build
-```
+#### install `npm i`
 
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+#### launch `npm run serve`
